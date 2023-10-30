@@ -60,4 +60,8 @@ public class RecipeService {
     public Iterable<Recipe> getRecipes() {
         return iRecipeRepo.findAll();
     }
+
+    public Recipe getRecipeById(Long recipeId) {
+        return iRecipeRepo.findById(recipeId).orElse(null);
+    }
 }
