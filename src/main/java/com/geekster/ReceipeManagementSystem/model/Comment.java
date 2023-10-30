@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
+@Data
 @Table(name = "comment")
 public class Comment {
 
@@ -22,17 +22,18 @@ public class Comment {
     @Column(nullable = false)
     private String text;
 
-    @Column(name = "comment_user_id")
-    private Long commentUserId;
+    @Column(name = "commenter_user_id")
+    private Long commenterUserId;
 
-    @JsonProperty(access =  JsonProperty.Access.READ_ONLY)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime commentCreationTimeStamp;
 
     @ManyToOne
     private Recipe recipe;
 
+
     @ManyToOne
     private User user;
 
-
 }
+

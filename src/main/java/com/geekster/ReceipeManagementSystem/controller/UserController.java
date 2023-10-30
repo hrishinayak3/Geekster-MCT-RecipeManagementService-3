@@ -1,6 +1,5 @@
 package com.geekster.ReceipeManagementSystem.controller;
 
-
 import com.geekster.ReceipeManagementSystem.dto.SignInInput;
 import com.geekster.ReceipeManagementSystem.dto.SignUpOutput;
 import com.geekster.ReceipeManagementSystem.model.Comment;
@@ -10,8 +9,6 @@ import com.geekster.ReceipeManagementSystem.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -37,10 +34,15 @@ public class UserController {
         return userService.signOutUser(email);
     }
 
-    @PostMapping("/{email}/Addcomment")
+    @PostMapping("/{email}/AddCommentToRecipe")
     public String addCommentToRecipe(@RequestParam Long recipeId, @RequestParam String commentText, @PathVariable String email) {
         User currentUser = userService.getUserByEmail(email);
         return userService.addCommentToRecipe(recipeId, commentText, currentUser);
+    }
+
+    @DeleteMapping("/{email}/RemoveRecipe")
+    public String removeRecipe(@RequestParam Long recipeId, @PathVariable String email) {
+        return userService.removeRecipe(recipeId, email);
     }
 
     @PostMapping("/{email}/CreateRecipe")
@@ -48,17 +50,9 @@ public class UserController {
         return userService.createRecipe(recipe, email);
     }
 
-
-    @DeleteMapping("/{email}/DeleteRecipe")
-    public String removeRecipe(@RequestParam Long recipeId, @PathVariable String email) {
-        return userService.deleteRecipe(recipeId, email);
-    }
-
-
-
     @DeleteMapping("/{email}/RemoveComment")
     public String removeComment(@RequestParam Long commentId, @PathVariable String email) {
-        return userService.deleteComment(commentId, email);
+        return userService.removeComment(commentId, email);
     }
 
     @GetMapping("/users/{email}/AllRecipesByUser")
@@ -73,3 +67,4 @@ public class UserController {
         return ResponseEntity.ok(comments);
     }
 }
+

@@ -1,43 +1,52 @@
 package com.geekster.ReceipeManagementSystem.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.geekster.ReceipeManagementSystem.recipeType.RecipeType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Entity
-@Table(name = "recipe")
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Data
 public class Recipe {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Long id;
 
-    @Column(name = "name")
+    @NotBlank(message = "Recipe Name is required")
     private String name;
 
-    @Column(name = "ingredients")
+    @Enumerated(EnumType.STRING)
+    private RecipeType recipeType;
+
+    @NotEmpty(message = "Ingredients are required")
     private String ingredients;
 
-    @Column(name = "instructions")
+    @NotEmpty(message = "Instructions are required")
     private String instructions;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime recipeAddedTimeStamp;
 
+
     @ManyToOne
     @JoinColumn(name = "owner")
     private User owner;
 
+
     @OneToMany(mappedBy = "recipe")
     private List<Comment> comments;
 
-
 }
+
+

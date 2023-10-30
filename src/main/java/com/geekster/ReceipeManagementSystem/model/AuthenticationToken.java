@@ -1,5 +1,6 @@
 package com.geekster.ReceipeManagementSystem.model;
 
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,20 +18,22 @@ public class AuthenticationToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long tokenId;
-
     private String tokenValue;
+    private LocalDateTime tokenCreationDateTime;
 
-    private LocalDateTime tokenCreationTime;
-
+    //mapping
     @OneToOne
+    @JoinColumn(name = "fk_user_Id")
     User user;
 
 
-    public AuthenticationToken(User user){
+    //create a parameterized constructor which takes user as an argument
+    public AuthenticationToken(User user)
+    {
         this.user = user;
         this.tokenValue = UUID.randomUUID().toString();
-        this.tokenCreationTime= LocalDateTime.now();
-
+        this.tokenCreationDateTime = LocalDateTime.now();
     }
-
 }
+
+

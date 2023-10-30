@@ -2,55 +2,60 @@ package com.geekster.ReceipeManagementSystem.service;
 
 import com.geekster.ReceipeManagementSystem.model.Comment;
 import com.geekster.ReceipeManagementSystem.model.User;
-import com.geekster.ReceipeManagementSystem.repo.ICommentRepo;
+import com.geekster.ReceipeManagementSystem.repo.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.*;
+
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CommentService {
 
     @Autowired
-    ICommentRepo iCommentRepo;
+    CommentRepository commentRepository;
 
-    public String addcomment(Comment comment){
+    public String  addComment(Comment comment) {
         comment.setCommentCreationTimeStamp(LocalDateTime.now());
-        iCommentRepo.save(comment);
-        return "Comment added!";
+        commentRepository.save(comment);
+        return "Comment has been added!!!";
     }
 
-    public List<Comment> getCommentForRecipe(Long recipeId){
-        return iCommentRepo.findByCommenterUserId(recipeId);
-
+    public Comment findComment(Long commentId) {
+        return  commentRepository.findById(commentId).orElse(null);
     }
 
-    public List<Comment> getAllComment(){
-        return iCommentRepo.findAll();
+    public List<Comment> getAllComments() {
+        return commentRepository.findAll();
     }
 
-    public Comment updateComment(Comment updateComment, Long commentId, User currenUser){
-        Comment existingComment = iCommentRepo.findById(commentId).orElse(null);
 
+    public List<Comment> getCommentsForRecipe(Long recipeId) {
+        return commentRepository.findByCommenterUserId(recipeId);
+    }
 
-        if( existingComment != null) {
-            if (existingComment.getUser().equals(currenUser)) {
-                existingComment.setUser(updateComment.getUser());
-                return iCommentRepo.save(existingComment);
+    public Comment getCommentsForUser(Long userId) {
+        return commentRepository.findById(userId).orElse(null);
+    }
+
+    public Comment updateComment(Comment updatedComment, Long commentId, User currentUser) {
+        Comment existingComment = commentRepository.findById(commentId).orElse(null);
+
+        if (existingComment != null) {
+            if (existingComment.getUser().equals(currentUser)) {
+                existingComment.setUser(updatedComment.getUser());
+                return commentRepository.save(existingComment);
             } else {
-                throw new IllegalStateException("You cannot make changes for this user");
+                throw new IllegalStateException("You are not authorized to update this comment");
             }
         }
         return null;
-
-    }
-
-    public void deleteComment(Comment comment){
-        iCommentRepo.delete(comment);
     }
 
 
-    public Comment findComment(Long commentId) {
-        return  iCommentRepo.findById(commentId).orElse(null);
+    public void removeComment(Comment comment) {
+        commentRepository.delete(comment);
+
     }
 }

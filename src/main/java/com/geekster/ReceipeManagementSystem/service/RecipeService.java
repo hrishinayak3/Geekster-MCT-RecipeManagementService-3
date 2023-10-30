@@ -3,65 +3,76 @@ package com.geekster.ReceipeManagementSystem.service;
 
 import com.geekster.ReceipeManagementSystem.model.Recipe;
 import com.geekster.ReceipeManagementSystem.model.User;
-import com.geekster.ReceipeManagementSystem.repo.IRecipeRepo;
+import com.geekster.ReceipeManagementSystem.repo.RecipeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+
 @Service
 public class RecipeService {
-
-
     @Autowired
-    IRecipeRepo iRecipeRepo;
+    private RecipeRepository recipeRepository;
 
-    public void addRecipe(Recipe recipe){
+    public void createRecipe(Recipe recipe) {
         recipe.setRecipeAddedTimeStamp(LocalDateTime.now());
-        iRecipeRepo.save(recipe);
+        recipeRepository.save(recipe);
     }
 
     public Recipe findRecipe(Long recipeId){
-        return iRecipeRepo.findById(recipeId).orElse(null);
+        return recipeRepository.findById(recipeId).orElse(null);
     }
 
-    public String updateRecipe(Long recipeId, Recipe updateRecipe, User currentUser ){
-        Recipe existingRecipe = iRecipeRepo.findById(recipeId).orElse(null);
+    public String updateRecipe(Long recipeId, Recipe updatedRecipe, User currentUser) {
+        Recipe existingRecipe = recipeRepository.findById(recipeId).orElse(null);
 
-        if(existingRecipe != null && existingRecipe.equals(currentUser)){
-            existingRecipe.setName(updateRecipe.getName());
-            existingRecipe.setIngredients(updateRecipe.getIngredients());
-            existingRecipe.setInstructions(updateRecipe.getInstructions());
+        if (existingRecipe != null && existingRecipe.getOwner().equals(currentUser)) {
+            existingRecipe.setName(updatedRecipe.getName());
+            existingRecipe.setIngredients(updatedRecipe.getIngredients());
+            existingRecipe.setInstructions(updatedRecipe.getInstructions());
 
-            iRecipeRepo.save(existingRecipe);
+            recipeRepository.save(existingRecipe);
 
-            return "Recipe Updated!!";
+            return "Recipe updated successfully";
+        } else {
+            throw new IllegalStateException("You are not authorized to update this recipe");
+        }
+    }
 
+    public String removeRecipe(Long recipeId, User user) {
+        Recipe recipe = recipeRepository.findById(recipeId).orElse(null);
+        if(recipe!=null && recipe.getOwner().equals(user))
+        {
+            recipeRepository.deleteById(recipeId);
+            return "Recipe removed successfully!!!";
+        }
+        else if(recipe == null)
+        {
+            return "Recipe to be deleted does not exist";
         }
         else{
-            throw new IllegalStateException("You cannot make changes for this user");
+            return "Unauthorized deleting!";
         }
     }
 
-    public String removeRecipe(Long recipeId, User user){
-        Recipe recipe  = iRecipeRepo.findById(recipeId).orElse(null);
-        if( recipe != null && recipe.equals(user)){
-            iRecipeRepo.deleteById(recipeId);
-            return "Recipe deleted succesfully";
-        }
-        else{
-            return "Unauthorized User";
-        }
 
+
+    public boolean validateRecipe(Recipe recipe){
+        return (recipe!=null && recipeRepository.existsById(recipe.getId()));
     }
 
 
-    public Iterable<Recipe> getRecipes() {
-        return iRecipeRepo.findAll();
-    }
 
     public Recipe getRecipeById(Long recipeId) {
-        return iRecipeRepo.findById(recipeId).orElse(null);
+
+        return recipeRepository.findById(recipeId).orElse(null);
     }
+
+    public Iterable<Recipe> getRecipes(){
+        return recipeRepository.findAll();
+    }
+
+
 }
+

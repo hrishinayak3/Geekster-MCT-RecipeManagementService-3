@@ -1,37 +1,42 @@
 package com.geekster.ReceipeManagementSystem.service;
 
+
 import com.geekster.ReceipeManagementSystem.model.AuthenticationToken;
 import com.geekster.ReceipeManagementSystem.model.User;
-import com.geekster.ReceipeManagementSystem.repo.IAuthenticationRepo;
+import com.geekster.ReceipeManagementSystem.repo.AuthenticationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthenticationService {
-
     @Autowired
-    IAuthenticationRepo iAuthenticationRepo;
+    private AuthenticationRepository authenticationRepo;
 
-    public boolean authenticate(String email, String authTokenValue){
-        AuthenticationToken authToken = iAuthenticationRepo.findFirstByTokenValue(authTokenValue);
+    public boolean authenticate(String email, String authTokenValue)
+    {
+        AuthenticationToken authToken = authenticationRepo.findFirstByTokenValue(authTokenValue);
 
-        if( authToken == null){
+        if(authToken == null)
+        {
             return false;
         }
 
-        String tokenEmailConnected = authToken.getUser().getEmail();
-        return tokenEmailConnected.equals(email);
+        String tokenConnectedEmail = authToken.getUser().getEmail();
+
+        return tokenConnectedEmail.equals(email);
     }
 
-    public void saveAuthToken(AuthenticationToken authToken){
-        iAuthenticationRepo.save(authToken);
+    public void saveAuthToken(AuthenticationToken authToken)
+    {
+        authenticationRepo.save(authToken);
     }
 
-    public void removeToken(AuthenticationToken authToken){
-        iAuthenticationRepo.delete(authToken);
+    public AuthenticationToken findFirstByUser(User user) {
+        return authenticationRepo.findFirstByUser(user);
     }
 
-    public AuthenticationToken findFirstByUser(User user){
-        return iAuthenticationRepo.findFirstByUser(user);
+    public void removeToken(AuthenticationToken token) {
+        authenticationRepo.delete(token);
     }
 }
+
